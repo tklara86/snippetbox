@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -15,11 +17,23 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := w.Write([]byte("Hello from SnippetBox"))
+	tmpl, err := template.ParseFiles("./ui/html/home.page.tmpl")
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Println(err.Error())
+		http.Error(w, "internal Server error", http.StatusInternalServerError)
 		return
 	}
+	//_, err := w.Write([]byte("Hello from SnippetBox"))
+	//if err != nil {
+	//	http.Error(w, "Bad request", http.StatusBadRequest)
+	//	return
+	//}
+	err = tmpl.Execute(w, nil)
+	if err != nil {
+		log.Printf(err.Error())
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+	}
+
 }
 
 // ShowSnippet handler function
