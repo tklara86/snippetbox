@@ -1,14 +1,10 @@
-package main
+package handlers
 
 import (
-	"context"
-	"log"
+	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
-	"time"
+	"strconv"
 )
-
 
 // Home Handler
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -28,14 +24,22 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 // ShowSnippet handler function
 func ShowSnippet(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("Display specific snippets"))
+	// Get the id parameter from url e.g /snippet?id=123
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+	_, err = fmt.Fprintf(w, "Display a specific with ID %d", id)
 	if err != nil {
 		http.Error(w, "could not get a snippet", http.StatusBadRequest)
 	}
 }
+
 // CreateSnippet handler function
 func CreateSnippet(w http.ResponseWriter, r *http.Request) {
 
+	// Check if HTTP method POST
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		w.Header().Set("Content-Type", "application/json")
@@ -51,40 +55,4 @@ func CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "could not create a snippet", http.StatusBadRequest)
 	}
-}
-
-func main() {
-	l := log.New(os.Stdout, "snippetbox-", log.LstdFlags)
-	// router - servemux
-	sm := http.NewServeMux()
-	sm.HandleFunc("/", Home)
-	sm.HandleFunc("/snippet", ShowSnippet)
-	sm.HandleFunc("/snippet/create", CreateSnippet)
-
-	srv := http.Server{
-		Addr: ":8080",
-		Handler: sm,
-		ErrorLog: l,
-	}
-
-	// start the server
-	go func() {
-		err := srv.ListenAndServe()
-		if err != nil {
-			l.Fatal(err)
-		}
-	}()
-
-	// Graceful shutdown
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan, os.Interrupt)
-	signal.Notify(sigChan, os.Kill)
-
-	sig := <-sigChan
-	l.Println("Received terminate, graceful shutdown", sig)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	_ = srv.Shutdown(ctx)
 }
