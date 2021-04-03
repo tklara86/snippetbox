@@ -1,3 +1,3 @@
 ## SnippetBox
 
-SnippetBox is a Go application which lets you paste and share snippets of text.
+Web application written in Go which lets you paste and share snippets of text.
