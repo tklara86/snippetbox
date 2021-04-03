@@ -17,17 +17,20 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("./ui/html/home.page.tmpl")
+	files := []string{
+		"./ui/html/home.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	// Parses tmpl files
+	tmpl, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "internal Server error", http.StatusInternalServerError)
 		return
 	}
-	//_, err := w.Write([]byte("Hello from SnippetBox"))
-	//if err != nil {
-	//	http.Error(w, "Bad request", http.StatusBadRequest)
-	//	return
-	//}
+
 	err = tmpl.Execute(w, nil)
 	if err != nil {
 		log.Printf(err.Error())

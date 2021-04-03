@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/tklara86/snippetbox/cmd/handlers"
+	"github.com/tklara86/snippetbox/cmd/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +19,11 @@ func main() {
 	sm.HandleFunc("/", handlers.Home)
 	sm.HandleFunc("/snippet", handlers.ShowSnippet)
 	sm.HandleFunc("/snippet/create", handlers.CreateSnippet)
+
+	// creates file server which serves files out the './ui/static'
+	fileServer := http.FileServer(http.Dir("./ui/static"))
+
+	sm.Handle("/static/", http.StripPrefix("/static", middleware.Neuter(fileServer)))
 
 	srv := http.Server{
 		Addr: ":8080",
