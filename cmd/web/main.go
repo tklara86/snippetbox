@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"github.com/tklara86/snippetbox/cmd/handlers"
 	"github.com/tklara86/snippetbox/cmd/middleware"
 	"log"
@@ -13,7 +14,14 @@ import (
 
 
 func main() {
-	l := log.New(os.Stdout, "snippetbox-", log.LstdFlags)
+	// Log errors
+	errorLog := log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile)
+	infoLog := log.New(os.Stdout, "INFO - ", log.LstdFlags)
+
+	addr := flag.String("addr", ":8080", "HTTP network address")
+
+	flag.Parse()
+
 	// router - servemux
 	sm := http.NewServeMux()
 	sm.HandleFunc("/", handlers.Home)
@@ -25,17 +33,18 @@ func main() {
 
 	sm.Handle("/static/", http.StripPrefix("/static", middleware.Neuter(fileServer)))
 
+	// go run ./cmd/web -addr=":4000"
 	srv := http.Server{
-		Addr: ":8080",
+		Addr: *addr,
 		Handler: sm,
-		ErrorLog: l,
+		ErrorLog: errorLog,
 	}
-
+	infoLog.Printf("Starting server on %s", *addr)
 	// start the server
 	go func() {
 		err := srv.ListenAndServe()
 		if err != nil {
-			l.Fatal(err)
+			errorLog.Fatal(err)
 		}
 	}()
 
@@ -45,7 +54,7 @@ func main() {
 	signal.Notify(sigChan, os.Kill)
 
 	sig := <-sigChan
-	l.Println("Received terminate, graceful shutdown", sig)
+	errorLog.Println("Received terminate, graceful shutdown", sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
