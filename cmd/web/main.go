@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/cmd/handlers"
 	"github.com/tklara86/snippetbox/cmd/middleware"
 	"log"
@@ -13,20 +14,24 @@ import (
 )
 
 
+
 func main() {
-	// Log errors
-	errorLog := log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile)
-	infoLog := log.New(os.Stdout, "INFO - ", log.LstdFlags)
+
+	app := &config.AppConfig{
+		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
+		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
+	}
 
 	addr := flag.String("addr", ":8080", "HTTP network address")
 
 	flag.Parse()
 
+
 	// router - servemux
 	sm := http.NewServeMux()
-	sm.HandleFunc("/", handlers.Home)
-	sm.HandleFunc("/snippet", handlers.ShowSnippet)
-	sm.HandleFunc("/snippet/create", handlers.CreateSnippet)
+	sm.HandleFunc("/", handlers.Home(app))
+	sm.HandleFunc("/snippet", handlers.ShowSnippet(app))
+	sm.HandleFunc("/snippet/create", handlers.CreateSnippet(app))
 
 	// creates file server which serves files out the './ui/static'
 	fileServer := http.FileServer(http.Dir("./ui/static"))
@@ -37,15 +42,14 @@ func main() {
 	srv := http.Server{
 		Addr: *addr,
 		Handler: sm,
-		ErrorLog: errorLog,
+		ErrorLog: app.ErrorLog,
 	}
-	infoLog.Printf("Starting server on %s", *addr)
+	app.InfoLog.Printf("Starting server on port %s", *addr)
 	// start the server
 	go func() {
 		err := srv.ListenAndServe()
-		if err != nil {
-			errorLog.Fatal(err)
-		}
+		app.ErrorLog.Fatal(err)
+
 	}()
 
 	// Graceful shutdown
@@ -54,7 +58,7 @@ func main() {
 	signal.Notify(sigChan, os.Kill)
 
 	sig := <-sigChan
-	errorLog.Println("Received terminate, graceful shutdown", sig)
+	app.InfoLog.Println("Received terminate, graceful shutdown", sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
