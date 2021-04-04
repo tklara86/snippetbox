@@ -28,14 +28,14 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 		tmpl, err := template.ParseFiles(files...)
 		if err != nil {
 
-			app.ErrorLog.Println(err.Error())
+			app.ServerError(w,err) // Use the serverError() helper.
 			http.Error(w, "internal Server error", http.StatusInternalServerError)
 			return
 		}
 
 		err = tmpl.Execute(w, nil)
 		if err != nil {
-			app.ErrorLog.Printf(err.Error())
+			app.ServerError(w,err) // Use the serverError() helper.
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 		}
 	}
@@ -45,7 +45,7 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 		// Get the id parameter from url e.g /snippet?id=123
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil || id < 1 {
-			http.NotFound(w, r)
+			app.NotFound(w) // Use the NotFound() helper
 			return
 		}
 		_, err = fmt.Fprintf(w, "Display a specific with ID %d", id)
@@ -67,7 +67,7 @@ func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 			_, err := w.Write([]byte("Method Not Allowed"))
 
 			if err != nil {
-				http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+				app.ErrorLog.Println("Method not allowed") // Use the ClientError() helper
 			}
 			return
 		}

@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"github.com/tklara86/snippetbox/cmd/config"
-	"github.com/tklara86/snippetbox/cmd/handlers"
-	"github.com/tklara86/snippetbox/cmd/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +14,6 @@ import (
 
 
 func main() {
-
 	app := &config.AppConfig{
 		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
 		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
@@ -27,21 +24,10 @@ func main() {
 	flag.Parse()
 
 
-	// router - servemux
-	sm := http.NewServeMux()
-	sm.HandleFunc("/", handlers.Home(app))
-	sm.HandleFunc("/snippet", handlers.ShowSnippet(app))
-	sm.HandleFunc("/snippet/create", handlers.CreateSnippet(app))
-
-	// creates file server which serves files out the './ui/static'
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-
-	sm.Handle("/static/", http.StripPrefix("/static", middleware.Neuter(fileServer)))
-
 	// go run ./cmd/web -addr=":4000"
 	srv := http.Server{
 		Addr: *addr,
-		Handler: sm,
+		Handler: routes(app),
 		ErrorLog: app.ErrorLog,
 	}
 	app.InfoLog.Printf("Starting server on port %s", *addr)
