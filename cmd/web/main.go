@@ -22,15 +22,15 @@ func main() {
 	addr := flag.String("addr", ":8080", "HTTP network address")
 
 	flag.Parse()
-
-
 	// go run ./cmd/web -addr=":4000"
+
 	srv := http.Server{
 		Addr: *addr,
 		Handler: routes(app),
 		ErrorLog: app.ErrorLog,
 	}
 	app.InfoLog.Printf("Starting server on port %s", *addr)
+
 	// start the server
 	go func() {
 		err := srv.ListenAndServe()

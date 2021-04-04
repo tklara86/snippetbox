@@ -9,7 +9,6 @@ import (
 )
 
 // Home Handler
-
 func Home (app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -40,6 +39,8 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 		}
 	}
 }
+
+// ShowSnippet handler
 func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the id parameter from url e.g /snippet?id=123

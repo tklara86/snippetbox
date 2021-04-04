@@ -17,5 +17,6 @@ func routes(app *config.AppConfig) *http.ServeMux {
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 
 	sm.Handle("/static/", http.StripPrefix("/static", middleware.Neuter(fileServer)))
+
 	return sm
 }
