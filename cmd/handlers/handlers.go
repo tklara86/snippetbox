@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/tklara86/snippetbox/cmd/config"
+	"github.com/tklara86/snippetbox/pkg/models"
 	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // Home Handler
@@ -49,33 +52,49 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 			app.NotFound(w) // Use the NotFound() helper
 			return
 		}
-		_, err = fmt.Fprintf(w, "Display a specific with ID %d", id)
+		// Use the SnippetModel object's Get method to retrieve the data for a
+		// specific record based on its ID. If no matching record is found,
+		// return a 404 Not Found response.
+		s, err := app.Snippets.Get(id)
 		if err != nil {
-			http.Error(w, "could not get a snippet", http.StatusBadRequest)
+			if errors.Is(err, models.ErrNoRecord) {
+				app.NotFound(w)
+			} else {
+				app.ServerError(w, err)
+			}
+			return
 		}
+
+		_, err = fmt.Fprintf(w, "%v", s)
+
+
 	}
+
 }
 
 
 // CreateSnippet handler function
 func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Check if HTTP method POST
+
 		if r.Method != http.MethodPost {
 			w.Header().Set("Allow", http.MethodPost)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(405)
-			_, err := w.Write([]byte("Method Not Allowed"))
-
-			if err != nil {
-				app.ErrorLog.Println("Method not allowed") // Use the ClientError() helper
-			}
+			app.ClientError(w, http.StatusMethodNotAllowed)
 			return
 		}
-		_, err := w.Write([]byte(`{"msg": "Create a new snippet"}`))
+
+		title := "O snail2"
+		content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
+		expires := time.Now().Add(time.Hour * 24 * 10)
+
+		id, err := app.Snippets.Insert(title,content,expires)
+
 		if err != nil {
-			http.Error(w, "could not create a snippet", http.StatusBadRequest)
+			app.ServerError(w, err)
+			return
 		}
+
+		http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
 	}
 
 }

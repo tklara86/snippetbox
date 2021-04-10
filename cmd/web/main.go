@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/tklara86/snippetbox/cmd/config"
+	"github.com/tklara86/snippetbox/pkg/models/postgres"
 	"log"
 	"net/http"
 	"os"
@@ -46,10 +47,7 @@ func main() {
 	dbname := os.Getenv("DBNAME")
 
 
-	app := &config.AppConfig{
-		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
-		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
-	}
+
 
 	addr := flag.String("addr", ":8080", "HTTP network address")
 
@@ -60,9 +58,21 @@ func main() {
 
 	db, err := openDB(*dsn)
 
+	// Initialize a mysql.SnippetModel instance and add it to the application
+	// dependencies.
+	app := &config.AppConfig{
+		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
+		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
+		Snippets: &postgres.SnippetModel{
+			DB: db,
+		},
+	}
+
 	if err != nil {
 		app.ErrorLog.Fatal(err)
 	}
+
+
 
 	// Defer a call to db.Close(), so that the connection pool is closed
 	// before the main() function exits
@@ -71,6 +81,7 @@ func main() {
 			app.ErrorLog.Fatal(err)
 		}
 	}()
+
 
 
 	srv := http.Server{
