@@ -4,18 +4,28 @@
 {{define "main"}}
 <main class="uk-container uk-container-small">
     <h2>Latest Snippets</h2>
-    <p>There's nothing to see here yet!</p>
-    <div class='snippet'>
-        <div class='metadata' style="display: flex; justify-content: space-between;">
-            <strong>Title: {{.Title}}</strong>
-            <span>#{{.ID}}</span>
-        </div>
-        <pre class="uk-background-muted"><code style="color: #212121;">{{.Content}}</code></pre>
-        <div class='metadata'>
-            <time>Created: {{.Created}} </time>
-            <time>Expires: {{.Expires}}</time>
-        </div>
-    </div>
+    {{if .Snippets}}
+    <table class="uk-table uk-table-responsive uk-table-divider">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Created</th>
+            <th>Id</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Snippets}}
+        <tr>
+            <td><a href='/snippet?id={{.ID}}'>{{.Title}}</a></td>
+            <td>{{.Created}}</td>
+            <td>{{.ID}}</td>
+        </tr>
+        {{end}}
+        </tbody>
+    </table>
+    {{else}}
+        <p>There's nothing to see here yet!</p>
+    {{end}}
 </main>
 {{end}}
 

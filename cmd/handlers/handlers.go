@@ -14,6 +14,8 @@ import (
 
 type templateData struct {
 	Snippet 	*models.Snippet
+	Snippets	[]*models.Snippet
+
 }
 
 // Home Handler
@@ -31,14 +33,9 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
-		for _, snippet := range s {
-			 _, err := fmt.Fprintf(w, "%v\n", snippet)
-			 if err != nil {
-			 	app.ErrorLog.Println("Couldn't get snippets")
-			 }
 
 
-		}
+		data := &templateData{Snippets: s}
 
 		files := []string{
 			"./ui/html/home.page.tmpl",
@@ -55,7 +52,7 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
-		err = tmpl.Execute(w, nil)
+		err = tmpl.Execute(w, data)
 		if err != nil {
 			app.ServerError(w,err) // Use the serverError() helper.
 			http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -85,10 +82,12 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
+
+
 		// Create an instance of a templateData struct holding the snippet data.
 		data := &templateData{Snippet: s}
 
-		fmt.Println(data)
+
 		files := []string{
 			"./ui/html/show.page.tmpl",
 			"./ui/html/base.layout.tmpl",

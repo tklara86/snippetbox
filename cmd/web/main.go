@@ -58,20 +58,28 @@ func main() {
 
 	db, err := openDB(*dsn)
 
+	// Initialize a new template cache...
+	templateCache, err := NewTemplateCache("./ui/html/")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Initialize a mysql.SnippetModel instance and add it to the application
 	// dependencies.
+
+
 	app := &config.AppConfig{
 		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
 		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
 		Snippets: &postgres.SnippetModel{
 			DB: db,
 		},
+		TemplateCache: templateCache,
 	}
 
-	if err != nil {
-		app.ErrorLog.Fatal(err)
-	}
+	//if err != nil {
+	//	app.ErrorLog.Fatal(err)
+	//}
 
 
 
