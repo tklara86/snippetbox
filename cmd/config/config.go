@@ -6,8 +6,7 @@ import (
 )
 
 type AppConfig struct {
-	InfoLog  	*log.Logger
-	ErrorLog 	*log.Logger
-	Snippets 	*postgres.SnippetModel
-
+	InfoLog  		*log.Logger
+	ErrorLog 		*log.Logger
+	Snippets 		*postgres.SnippetModel
 }

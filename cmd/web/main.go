@@ -58,6 +58,7 @@ func main() {
 
 	db, err := openDB(*dsn)
 
+
 	// Initialize a mysql.SnippetModel instance and add it to the application
 	// dependencies.
 	app := &config.AppConfig{

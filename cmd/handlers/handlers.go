@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+
+type templateData struct {
+	Snippet 	*models.Snippet
+}
+
 // Home Handler
 func Home (app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +23,21 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 			// replies with 404 HTTP status error
 			http.NotFound(w, r)
 			return
+		}
+
+		s, err := app.Snippets.Latest()
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
+
+		for _, snippet := range s {
+			 _, err := fmt.Fprintf(w, "%v\n", snippet)
+			 if err != nil {
+			 	app.ErrorLog.Println("Couldn't get snippets")
+			 }
+
+
 		}
 
 		files := []string{
@@ -65,9 +85,26 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
-		_, err = fmt.Fprintf(w, "%v", s)
+		// Create an instance of a templateData struct holding the snippet data.
+		data := &templateData{Snippet: s}
 
+		fmt.Println(data)
+		files := []string{
+			"./ui/html/show.page.tmpl",
+			"./ui/html/base.layout.tmpl",
+			"./ui/html/footer.partial.tmpl",
+		}
 
+		ts, err := template.ParseFiles(files...)
+
+		if err != nil {
+			app.ServerError(w, err)
+		}
+
+		err = ts.Execute(w, data)
+		if err != nil {
+			app.ServerError(w, err)
+		}
 	}
 
 }
