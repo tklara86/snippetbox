@@ -32,8 +32,6 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 
-
-
 func main() {
 
 
