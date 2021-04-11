@@ -5,22 +5,15 @@ import (
 	"fmt"
 	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/pkg/models"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-
-type templateData struct {
-	Snippet 	*models.Snippet
-	Snippets	[]*models.Snippet
-
-}
-
 // Home Handler
-func Home (app *config.AppConfig) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func Home(app *config.AppConfig) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.URL.Path != "/" {
 			// replies with 404 HTTP status error
 			http.NotFound(w, r)
@@ -33,31 +26,9 @@ func Home (app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
-
-
-		data := &templateData{Snippets: s}
-
-		files := []string{
-			"./ui/html/home.page.tmpl",
-			"./ui/html/base.layout.tmpl",
-			"./ui/html/footer.partial.tmpl",
-		}
-
-		// Parses tmpl files
-		tmpl, err := template.ParseFiles(files...)
-		if err != nil {
-
-			app.ServerError(w,err) // Use the serverError() helper.
-			http.Error(w, "internal Server error", http.StatusInternalServerError)
-			return
-		}
-
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			app.ServerError(w,err) // Use the serverError() helper.
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-		}
-	}
+		// Render page and pass the data
+		app.Render(w,r, "home.page.tmpl", &config.TemplateData{Snippets: s})
+	})
 }
 
 // ShowSnippet handler
@@ -82,28 +53,8 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 			return
 		}
 
-
-
-		// Create an instance of a templateData struct holding the snippet data.
-		data := &templateData{Snippet: s}
-
-
-		files := []string{
-			"./ui/html/show.page.tmpl",
-			"./ui/html/base.layout.tmpl",
-			"./ui/html/footer.partial.tmpl",
-		}
-
-		ts, err := template.ParseFiles(files...)
-
-		if err != nil {
-			app.ServerError(w, err)
-		}
-
-		err = ts.Execute(w, data)
-		if err != nil {
-			app.ServerError(w, err)
-		}
+		// Render page and pass the data
+		app.Render(w,r, "show.page.tmpl", &config.TemplateData{Snippet: s})
 	}
 
 }

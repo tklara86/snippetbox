@@ -10,5 +10,5 @@ type AppConfig struct {
 	InfoLog  		*log.Logger
 	ErrorLog 		*log.Logger
 	Snippets 		*postgres.SnippetModel
-	TemplateCache   map[string]*template.Template
+	TemplateCache    map[string]*template.Template
 }

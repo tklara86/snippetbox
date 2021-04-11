@@ -17,6 +17,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+
 // The openDB() function wraps sql.Open() and returns a sql.DB connection pool
 // for a given DSN.
 func openDB(dsn string) (*sql.DB, error) {
@@ -32,7 +33,9 @@ func openDB(dsn string) (*sql.DB, error) {
 
 
 
+
 func main() {
+
 
 	// Load env variables
 	err := godotenv.Load(".env")
@@ -59,7 +62,7 @@ func main() {
 	db, err := openDB(*dsn)
 
 	// Initialize a new template cache...
-	templateCache, err := NewTemplateCache("./ui/html/")
+	templateCache, err := newTemplateCache("./ui/html/")
 	if err != nil {
 		log.Fatal(err)
 	}
