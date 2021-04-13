@@ -3,11 +3,11 @@ package main
 import (
 	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/cmd/handlers"
-	"github.com/tklara86/snippetbox/cmd/middleware"
+
 	"net/http"
 )
 
-func routes(app *config.AppConfig) *http.ServeMux {
+func routes(app *config.AppConfig) http.Handler {
 	sm := http.NewServeMux()
 	sm.Handle("/", handlers.Home(app))
 	sm.Handle("/snippet", handlers.ShowSnippet(app))
@@ -16,7 +16,7 @@ func routes(app *config.AppConfig) *http.ServeMux {
 	// creates file server which serves files out the './ui/static'
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 
-	sm.Handle("/static/", http.StripPrefix("/static", middleware.Neuter(fileServer)))
+	sm.Handle("/static/", http.StripPrefix("/static", config.Neuter(fileServer)))
 
-	return sm
+	return app.LogRequest(config.SecureHeaders(sm))
 }
