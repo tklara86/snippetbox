@@ -9,7 +9,8 @@ import (
 // Create a humanDate function which returns a nicely formatted string
 // representation of a time.Time object.
 func humanDate(t time.Time) string {
-	return t.Format("02 Jan 2006 at 15:04")
+	return t.Format("2 Jan, 2006")
+
 }
 
 var functions = template.FuncMap{

@@ -3,17 +3,16 @@ package config
 import (
 	"bytes"
 	"fmt"
+	"github.com/tklara86/snippetbox/pkg/forms"
 	"github.com/tklara86/snippetbox/pkg/models"
 	"log"
 	"net/http"
-	"net/url"
 	"runtime/debug"
 	"time"
 )
 type TemplateData struct {
 	CurrentYear 	int
-	FormData  		url.Values   // url.Values, which is the same underlying type as the r.PostForm map that held the data sent in the request body.
-	FormErrors  	map[string]string
+	Form			*forms.Form
 	Snippet 		*models.Snippet
 	Snippets		[]*models.Snippet
 }

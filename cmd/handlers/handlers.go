@@ -4,12 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/tklara86/snippetbox/cmd/config"
+	"github.com/tklara86/snippetbox/pkg/forms"
 	"github.com/tklara86/snippetbox/pkg/models"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
-	"unicode/utf8"
 )
 
 // Home Handler
@@ -59,7 +58,10 @@ func ShowSnippet(app *config.AppConfig) http.HandlerFunc {
 
 func CreateSnippetForm(app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
-		app.Render(w,r,"create.page.tmpl", nil)
+		app.Render(w,r,"create.page.tmpl", &config.TemplateData{
+			// Pass a new empty forms.Form object to the template.
+			Form: forms.New(nil),
+		})
 	}
 }
 
@@ -77,53 +79,30 @@ func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 			app.ClientError(w, http.StatusBadRequest)
 			return
 		}
-		// Use the r.PostForm.Get() method to retrieve the relevant data fields
-		// from the r.PostForm map.
-		title := r.PostForm.Get("title")
-		content := r.PostForm.Get("content")
-		expiresString := r.PostForm.Get("expires")
+		// Create a new forms.Form struct containing the POSTed data from the
+		// form, then use the validation methods to check the content.
+		form := forms.New(r.PostForm)
+		form.Required("title", "content", "expires")
+		form.MaxLength("title", 100)
+	//	form.PermittedValues("expires", "365", "7", "1")
 
-
-		// Initialize a mpa to hold any validation errors
-		errors := make(map[string]string)
-
-		// Check that the Title field isn't blank.
-		if strings.TrimSpace(title) == "" {
-			errors["title"] = "This field cannot be blank"
-		}
-		// Check that the Title field does not have more than 100 characters
-		if utf8.RuneCountInString(title) > 100 {
-			errors["title"] = "This field is too long (maximum is 100 characters)"
-		}
-
-		// Check that the Content field isn't blank.
-		if strings.TrimSpace(content) == "" {
-			errors["content"] = "This field cannot be blank"
-		}
-
-		// Check that the Expires field isn't blank.
-		if strings.TrimSpace(expiresString) == "" {
-			errors["expires"] = "This field cannot be blank"
-		}
-
-		//Check the expires field matches one of the permitted
-		// values ("1", "7" or "365").
-		if expiresString != "365" && expiresString != "7" && expiresString != "1" {
-			errors["expires"] = "This field is invalid"
-		}
-
-		if len(errors) > 0 {
-			app.Render(w, r, "create.page.tmpl", &config.TemplateData{
-				FormData: r.PostForm,
-				FormErrors: errors,
-			})
+		// If the form isn't valid, redisplay the template passing in the
+		// form.Form object as the data.
+		if !form.Valid() {
+			app.Render(w, r, "create.page.tmpl", &config.TemplateData{Form: form})
 			return
 		}
+
+		// Because the form data (with type url.Values) has been anonymously embedded
+		// in the form.Form struct, we can use the Get() method to retrieve
+		// the validated value for a particular form field.
+		expiresString := form.Get("expires")
+
 		i, _ := strconv.Atoi(expiresString)
 		exp := time.Duration(i)
 		expires := time.Now().Add(time.Hour * 24 * exp)
 
-		id, err := app.Snippets.Insert(title, content, expires)
+		id, err := app.Snippets.Insert(form.Get("title"),form.Get("content"), expires)
 
 		if err != nil {
 			app.ServerError(w, err)
