@@ -20,6 +20,7 @@ func Home(app *config.AppConfig) http.Handler {
 			return
 		}
 
+
 		s, err := app.Snippets.Latest()
 		if err != nil {
 			app.ServerError(w, err)

@@ -18,5 +18,5 @@ func routes(app *config.AppConfig) http.Handler {
 
 	sm.Handle("/static/", http.StripPrefix("/static", config.Neuter(fileServer)))
 
-	return app.LogRequest(config.SecureHeaders(sm))
+	return app.RecoverPanic(app.LogRequest(config.SecureHeaders(sm)))
 }
