@@ -14,7 +14,7 @@ type SnippetModel struct {
 	DB *sql.DB
 }
 
-// This will insert a new snippet into the database.
+// Insert This will insert a new snippet into the database.
 func (m *SnippetModel) Insert(title, content string, expires time.Time) (int, error) {
 
 	var id int
@@ -30,7 +30,7 @@ func (m *SnippetModel) Insert(title, content string, expires time.Time) (int, er
 	return id, nil
 }
 
-// This will return a specific snippet based on its id.
+// Get This will return a specific snippet based on its id.
 func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 
 	// Initialize a pointer to a new zeroed Snippet struct.
@@ -60,7 +60,7 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	return s, nil
 }
 
-// This will return the 10 most recently created snippets.
+// Latest This will return the 10 most recently created snippets.
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 
 	rows, err := m.DB.Query(`SELECT * FROM snippets WHERE expires > $1 ORDER BY created DESC LIMIT 10`, time.Now())

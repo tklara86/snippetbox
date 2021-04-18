@@ -6,13 +6,16 @@ import (
 	"github.com/tklara86/snippetbox/pkg/models"
 	"log"
 	"net/http"
+	"net/url"
 	"runtime/debug"
 	"time"
 )
 type TemplateData struct {
-	CurrentYear int
-	Snippet 	*models.Snippet
-	Snippets	[]*models.Snippet
+	CurrentYear 	int
+	FormData  		url.Values   // url.Values, which is the same underlying type as the r.PostForm map that held the data sent in the request body.
+	FormErrors  	map[string]string
+	Snippet 		*models.Snippet
+	Snippets		[]*models.Snippet
 }
 
 func (app *AppConfig) ServerError(w http.ResponseWriter, err error) {

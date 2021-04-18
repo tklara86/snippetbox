@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/bmizerany/pat"
+	"github.com/justinas/alice"
 	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/cmd/handlers"
 
@@ -8,15 +10,21 @@ import (
 )
 
 func routes(app *config.AppConfig) http.Handler {
-	sm := http.NewServeMux()
-	sm.Handle("/", handlers.Home(app))
-	sm.Handle("/snippet", handlers.ShowSnippet(app))
-	sm.Handle("/snippet/create", handlers.CreateSnippet(app))
+	// Create a middleware chain containing our 'standard' middleware
+	// which will be used for every request our application receives.
+	standardMiddleware := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)
+
+	sm := pat.New()
+	sm.Get("/", handlers.Home(app))
+	sm.Get("/snippet/create", handlers.CreateSnippetForm(app))
+	sm.Post("/snippet/create", handlers.CreateSnippet(app))
+	sm.Get("/snippet/:id", handlers.ShowSnippet(app))
 
 	// creates file server which serves files out the './ui/static'
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 
-	sm.Handle("/static/", http.StripPrefix("/static", config.Neuter(fileServer)))
+	sm.Get("/static/", http.StripPrefix("/static", config.Neuter(fileServer)))
 
-	return app.RecoverPanic(app.LogRequest(config.SecureHeaders(sm)))
+	// Return the 'standard' middleware chain followed by the servemux.
+	return standardMiddleware.Then(sm)
 }

@@ -1,0 +1,47 @@
+{{ template "base" .}}
+
+{{ define "title"}} Create a new snippet {{end}}
+
+{{define "main"}}
+    <form action='/snippet/create' method="post">
+        <fieldset class="uk-fieldset">
+            <div class="uk-margin">
+                <label>Title</label>
+                 {{ with .FormErrors.title}}
+                     <div class="uk-form-danger">
+                         <p>{{.}}</p>
+                     </div>
+                 {{end}}
+                 <input class="uk-input uk-form-large {{ with .FormErrors.title}} uk-form-danger  {{end}}" type="text" name="title" placeholder="Title" value="{{.FormData.Get "title"}}">
+            </div>
+            <div class="uk-margin">
+                <label>Content</label>
+                {{ with .FormErrors.content}}
+                    <div class="uk-form-danger">
+                        <p>{{.}}</p>
+                    </div>
+                {{end}}
+                <textarea class="uk-textarea uk-form-large {{ with .FormErrors.title}} uk-form-danger  {{end}}" rows="5" name="content" placeholder="Content">{{.FormData.Get "content"}}</textarea>
+            </div>
+            <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                <p>Delete in:</p>
+                {{ with .FormErrors.expires}}
+                    <div class="uk-form-danger">
+                        <p>{{.}}</p>
+                    </div>
+                {{end}}
+                {{$exp := or (.FormData.Get "expires") "365"}}
+                    <input class="uk-radio" type="radio" name="expires" value="365" {{if (eq $exp "365")}}  checked {{end}}>One Year
+
+
+                    <input class="uk-radio" type="radio" name="expires" value="7" {{if ( eq $exp "7")}}  checked {{end}}>One Weak
+
+
+                    <input class="uk-radio" type="radio" name="expires" value="1" {{if (eq $exp "1")}}  checked {{end}}>One Day
+
+            </div>
+            <button type="submit" class="uk-button uk-button-primary">Publish Snippet</button>
+        </fieldset>
+    </form>
+
+{{end}}
