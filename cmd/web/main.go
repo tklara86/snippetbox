@@ -73,6 +73,7 @@ func main() {
 
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
+	session.Secure = true
 
 	// And add the session manager to our application dependencies.
 	app := &config.AppConfig{
@@ -105,7 +106,7 @@ func main() {
 
 	// start the server
 	go func() {
-		err := srv.ListenAndServe()
+		err := srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 		app.ErrorLog.Fatal(err)
 
 	}()

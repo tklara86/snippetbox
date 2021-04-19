@@ -2,3 +2,5 @@
 ui/.DS_Store
 .DS_Store
 .env
+tls/cert.pem
+tls/key.pem
