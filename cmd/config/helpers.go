@@ -13,6 +13,7 @@ import (
 type TemplateData struct {
 	CurrentYear 	int
 	Form			*forms.Form
+	Flash 			string
 	Snippet 		*models.Snippet
 	Snippets		[]*models.Snippet
 }
@@ -37,6 +38,7 @@ func (app *AppConfig) addDefaultData(td *TemplateData, r *http.Request) *Templat
 		td = &TemplateData{}
 	}
 	td.CurrentYear = time.Now().Year()
+	td.Flash = app.Session.PopString(r, "flash")
 	return td
 }
 
@@ -72,5 +74,4 @@ func (app *AppConfig) Render(w http.ResponseWriter, r *http.Request, name string
 	}
 
 }
-
 

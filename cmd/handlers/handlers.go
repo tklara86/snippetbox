@@ -21,8 +21,12 @@ func Home(app *config.AppConfig) http.Handler {
 			return
 		}
 
+
+
 		// Render page and pass the data
-		app.Render(w,r, "home.page.tmpl", &config.TemplateData{Snippets: s})
+		app.Render(w,r, "home.page.tmpl", &config.TemplateData{
+			Snippets: s,
+		})
 	})
 }
 
@@ -108,6 +112,8 @@ func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 			app.ServerError(w, err)
 			return
 		}
+
+		app.Session.Put(r, "flash", "Snippet successfully created")
 
 		http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 	}

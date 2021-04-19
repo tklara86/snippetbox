@@ -25,6 +25,12 @@
 
     </nav>
     <main class="uk-container uk-container-small">
+        {{ with .Flash}}
+            <div class="uk-alert-success" uk-alert>
+                <a class="uk-alert-close" uk-close></a>
+                <p>{{.}}</p>
+            </div>
+        {{end}}
         {{ template "main" .}}
     </main>
 

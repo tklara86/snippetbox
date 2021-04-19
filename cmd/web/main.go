@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/golangcollege/sessions"
 	"github.com/joho/godotenv"
 	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/pkg/models/postgres"
@@ -54,6 +55,11 @@ func main() {
 
 	dsn := flag.String("dsn", "postgres://" + username + ":" + password + "@" + host + "/" + dbname + "?sslmode=disable", "Postgres data source name")
 
+	// Define a new command-line flag for the session secret (a random key which
+	// will be used to encrypt and authenticate session cookies). It should be 32
+	// bytes long.
+	secret := flag.String("secret", "9a7d0e35b825c535550d63b1bb95a8e099764feb53a3eb9bc3976fb430ea70af", "Secret key")
+
 	flag.Parse()
 	// go run ./cmd/web -addr=":4000"
 
@@ -65,23 +71,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Initialize a mysql.SnippetModel instance and add it to the application
-	// dependencies.
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
 
-
+	// And add the session manager to our application dependencies.
 	app := &config.AppConfig{
 		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
 		ErrorLog: log.New(os.Stderr, "ERROR - ", log.LstdFlags | log.Lshortfile),
+		Session: session,
 		Snippets: &postgres.SnippetModel{
 			DB: db,
 		},
 		TemplateCache: templateCache,
 	}
-
-	//if err != nil {
-	//	app.ErrorLog.Fatal(err)
-	//}
-
 
 
 	// Defer a call to db.Close(), so that the connection pool is closed
