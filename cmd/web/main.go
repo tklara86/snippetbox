@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -75,6 +76,14 @@ func main() {
 	session.Lifetime = 12 * time.Hour
 	session.Secure = true
 
+	//Initialize a tls.Config struct to hold the non-default TLS settings we want
+	// the server to use.
+	tlsConfig := tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
+
 	// And add the session manager to our application dependencies.
 	app := &config.AppConfig{
 		InfoLog: log.New(os.Stdout, "INFO - ", log.LstdFlags),
@@ -101,6 +110,10 @@ func main() {
 		Addr: *addr,
 		Handler: routes(app),
 		ErrorLog: app.ErrorLog,
+		TLSConfig: &tlsConfig,
+		IdleTimeout: time.Minute,
+		ReadTimeout: 5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	app.InfoLog.Printf("Starting server on port %s", *addr)
 
