@@ -23,6 +23,12 @@ func routes(app *config.AppConfig) http.Handler {
 	sm.Post("/snippet/create", dynamicMiddleware.Then(handlers.CreateSnippet(app)))
 	sm.Get("/snippet/:id", dynamicMiddleware.Then(handlers.ShowSnippet(app)))
 
+	sm.Get("/user/signup", dynamicMiddleware.Then(handlers.SignupUserForm(app)))
+	sm.Post("/user/signup", dynamicMiddleware.Then(handlers.SignUpUser(app)))
+	sm.Get("/user/login", dynamicMiddleware.Then(handlers.LoginUserForm(app)))
+	sm.Post("/user/login", dynamicMiddleware.Then(handlers.LoginUser(app)))
+	sm.Post("/user/logout", dynamicMiddleware.Then(handlers.LogoutUser(app)))
+
 	// creates file server which serves files out the './ui/static'
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 

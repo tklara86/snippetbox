@@ -6,6 +6,7 @@ import (
 	"github.com/tklara86/snippetbox/cmd/config"
 	"github.com/tklara86/snippetbox/pkg/forms"
 	"github.com/tklara86/snippetbox/pkg/models"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -118,4 +119,54 @@ func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 		http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 	}
 
+}
+
+// SignupUserForm signs up a new user
+func SignupUserForm(app *config.AppConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Displaying the user signup form")
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
+// SignUpUser creates a new user
+func SignUpUser(app *config.AppConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Creates a new user")
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
+// LoginUserForm displays the user login form
+func LoginUserForm(app *config.AppConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Display the user login form...")
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
+// LoginUser authenticates and login the user
+func LoginUser(app *config.AppConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Authenticate and login the user..")
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
+// LogoutUser logouts the user
+func LogoutUser(app *config.AppConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Logout the user...")
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }
