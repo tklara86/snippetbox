@@ -13,4 +13,5 @@ type AppConfig struct {
 	Session 		*sessions.Session
 	Snippets 		*postgres.SnippetModel
 	TemplateCache    map[string]*template.Template
+	Users			*postgres.UserModel
 }

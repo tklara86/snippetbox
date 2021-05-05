@@ -36,7 +36,6 @@ func openDB(dsn string) (*sql.DB, error) {
 
 func main() {
 
-
 	// Load env variables
 	err := godotenv.Load(".env")
 
@@ -48,9 +47,6 @@ func main() {
 	password := os.Getenv("PASSWORD")
 	host := os.Getenv("HOST")
 	dbname := os.Getenv("DBNAME")
-
-
-
 
 	addr := flag.String("addr", ":8080", "HTTP network address")
 
@@ -92,7 +88,11 @@ func main() {
 		Snippets: &postgres.SnippetModel{
 			DB: db,
 		},
+		Users: &postgres.UserModel{
+			DB: db,
+		},
 		TemplateCache: templateCache,
+
 	}
 
 
