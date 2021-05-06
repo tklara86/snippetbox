@@ -124,21 +124,48 @@ func CreateSnippet(app *config.AppConfig) http.HandlerFunc {
 // SignupUserForm signs up a new user
 func SignupUserForm(app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := fmt.Fprintln(w, "Displaying the user signup form")
-		if err != nil {
-			log.Fatalln(err)
-		}
+		app.Render(w,r, "signup.page.tmpl", &config.TemplateData{
+			Form: forms.New(nil),
+		})
 	}
 }
 
 // SignUpUser creates a new user
 func SignUpUser(app *config.AppConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := fmt.Fprintln(w, "Creates a new user")
+		err := r.ParseForm()
 		if err != nil {
-			log.Fatalln(err)
+			app.ClientError(w, http.StatusBadRequest)
+			return
 		}
+		// Validate the form contents
+		form := forms.New(r.PostForm)
+		form.Required("name", "email", "password")
+		form.MaxLength("name", 255)
+		form.MaxLength("email", 255)
+		form.MatchesPattern("email", forms.EmailRx)
+		form.MinLength("password", 10)
+
+		if !form.Valid() {
+			app.Render(w,r,"signup.page.tmpl", &config.TemplateData{
+				Form: form,
+			})
+			return
+		}
+		// Otherwise send a placeholder response (for now!).
+		err = app.Users.Insert(form.Get("name"), form.Get("email"), form.Get("password"))
+
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
+		app.Session.Put(r, "flash", "Your signup was successful. Please log in.")
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+
 	}
+
+
+
 }
 
 // LoginUserForm displays the user login form
