@@ -1,0 +1,128 @@
+/* Colours  */
+
+:root {
+  /* All my colors here share the same hue and saturation */
+  --base-blue: 222, 89%;
+  --base-green: 152, 50%;
+  --base-orange: 33, 100%;
+
+  /*
+    Colour palette. Each color is a partial value
+  */
+  --palette-blue-10: var(--base-blue), 10%;
+  --palette-blue-20: var(--base-blue), 20%;
+  --palette-blue-30: var(--base-blue), 30%;
+  --palette-blue-40: var(--base-blue), 40%;
+  --palette-blue-50: var(--base-blue), 50%;
+  --palette-blue-60: var(--base-blue), 60%;
+  --palette-blue-70: var(--base-blue), 70%;
+  --palette-blue-80: var(--base-blue), 80%;
+  --palette-blue-90: var(--base-blue), 90%;
+  --palette-blue-100: var(--base-blue), 100%;
+
+  --palette-green-10: var(--base-green), 10%;
+  --palette-green-20: var(--base-green), 20%;
+  --palette-green-30: var(--base-green), 30%;
+  --palette-green-40: var(--base-green), 40%;
+  --palette-green-50: var(--base-green), 50%;
+  --palette-green-60: var(--base-green), 60%;
+  --palette-green-70: var(--base-green), 70%;
+  --palette-green-80: var(--base-green), 80%;
+  --palette-green-90: var(--base-green), 90%;
+  --palette-green-100: var(--base-green), 100%;
+
+  --palette-orange-10: var(--base-orange), 10%;
+  --palette-orange-20: var(--base-orange), 20%;
+  --palette-orange-30: var(--base-orange), 30%;
+  --palette-orange-40: var(--base-orange), 40%;
+  --palette-orange-50: var(--base-orange), 50%;
+  --palette-orange-60: var(--base-orange), 60%;
+  --palette-orange-70: var(--base-orange), 70%;
+  --palette-orange-80: var(--base-orange), 80%;
+  --palette-orange-90: var(--base-orange), 90%;
+  --palette-orange-100: var(--base-orange), 100%;
+
+  --primary-blue: hsla(var(--palette-blue-50), 100%);
+  --primary-green: hsla(var(--palette-green-40), 100%);
+  --primary-orange: hsla(var(--palette-orange-50), 100%);
+}
+
+$theme-colors: (
+  "text": (
+    "white": #fff,
+    "accent": hsl(22, 100%, 60%),
+    "grey-light": #f5f5f5,
+    "grey-dark": #909090,
+    "body-text": #bcbcbc,
+    "body-text-alt": #293845,
+    "badge-primary--text": #23824f,
+    "badge-secondary--text": #245cd6,
+    "success-light--text": #489b4c,
+    "danger-light--text": #ff4747,
+    "warning-light--text": #f0b400,
+    "primary-light--text": #265cd4,
+    "secondary-light--text":#191919
+
+  ),
+  "bg-color": (
+    "primary": var(--primary-blue),
+    "primary-light": #2463eb45,
+    "primary-dark": #1c1b1b,
+    "secondary-dark": #454545,
+    "tertiary-dark": #707070,
+    "alt": #222121,
+    "navbar": #f7f7f9,
+    "albumCard-light": #F7F9FA,
+    "inputBgColor": #fbfbfb,
+    "cardBg": #F7F9FA,
+    "badge-primary": #C9E7D7,
+    "badge-secondary":#b5d6f3,
+    "success": #009106,
+    "danger": #e2143b,
+    "warning": hsl(36, 100%, 50%),
+    "success--light": #e8ffee,
+    "danger--light": #ffe5ea,
+    "warning--light": #fff8df,
+    "primary--light": #ccdcfc,
+    "secondary--light": #dbdbdb
+  )
+);
+
+/*
+ 	Example:  
+	background-color: theme-colors('background-color', 'light');
+ */
+@function theme-colors($key: "text", $variant: "grey-light") {
+  $map: map-get($theme-colors, $key);
+  @return map-get($map, $variant);
+}
+
+/* 
+	Creates tint or shade of color specified in $theme-colors
+	Tint or shade is controlled by number passed in between 0-10 e.g. 2.5 =  25%.
+	Example:
+	background-color: tint-shade-color-control(white, 'primary', 'dark', 2.5);
+ */
+// @function tint-shade-color-control($color-base: white, $color-name: "text", $key: "grey-light", $level: 0) {
+//   $color-interval: 10%;
+//   @if ($color-base == white) {
+//     $color: theme-colors($color-name, $key);
+//     @return mix($color-base, $color, $level * $color-interval);
+//   }
+//   @if ($color-base == black) {
+//     $color: theme-colors($color-name, $key);
+//     @return mix($color-base, $color, $level * $color-interval);
+//   }
+// }
+
+/* 
+	Controls opacity of color specified in $theme-colors
+	Opacity is controlled by number passed in between 0-10 e.g. 2.5 = .25.
+	Example:
+	background-color: opacity-color-control('primary', 'dark', 7);
+ */
+// @function opacity-color-control($color-name: "bg-color", $key: "primary-dark", $opacity: 0) {
+//   $opacity-interval: 10;
+//   $color: theme-colors($color-name, $key);
+//   @return rgba($color, $opacity / $opacity-interval);
+// }

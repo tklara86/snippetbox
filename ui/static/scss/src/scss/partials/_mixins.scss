@@ -1,0 +1,44 @@
+/* Media queries breakpoints */
+$breakpoints: (
+	sm: 380px,
+	md: 600px,
+	lg: 768px,
+	xl: 1024px,
+);
+
+@mixin breakpoint($breakpoint) {
+	@media (max-width: map-get($map: $breakpoints, $key: $breakpoint)) {
+		@content;
+	}
+}
+
+/*  No hover */
+@mixin no-hover {
+	@media (hover: none) {
+		@content;
+	}
+}
+/*  Font smooth  */
+@mixin fontSmooth {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+
+/*  Margin-top, left, right, bottom */
+$values: 120;
+
+@for $i from 1 through $values {
+	.mt-#{$i} {
+			margin-top: #{$i}px;
+	}
+	.mb-#{$i} {
+		margin-bottom: #{$i}px;
+	}
+	.ml-#{$i} {
+		margin-left: #{$i}px;
+	}
+	.mr-#{$i} {
+		margin-right: #{$i}px;
+	}
+}

@@ -1,0 +1,32 @@
+ @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+// @import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700&display=swap');
+//@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+//@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat&display=swap');
+
+
+/*
+  Using rems instead of pixels
+ */
+$font-size: 62.5%; /* 10px / 16px = 62.5%  1rem = 10px; */
+
+html {
+  font-size: $font-size;
+  font-family: $font-primary;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+body {
+  box-sizing: border-box;
+  font-size: var(--text-base-size);
+  color: $color-text;
+}
+

@@ -1,0 +1,101 @@
+form {
+  margin: 30px auto;
+  max-width: $form-witdh;
+}
+.input-control {
+  width: 100%;
+  font-size:$text--sm;
+  border: 2px solid #eee;
+  border-radius: 7px;
+
+  outline: none;
+
+  transition: all 0.3s ease;
+  &:focus {
+    border: 2px solid #1a55ca;
+    transition: all 0.3s ease;
+  }
+}
+
+.input-control--large {
+  margin-top: $space--sm;
+  margin-bottom: $space--md;
+  padding: $space--md;
+}
+
+.input-control--small {
+  margin-top: $space--xs;
+  margin-bottom: $space--md;
+  padding: $space--sm;
+}
+
+.form-control.radio input {
+  margin-left: 15px;
+  margin-right: 0;
+  cursor: pointer;
+  width: 20px;
+  opacity: 0;
+}
+.checkmark {
+  position: absolute;
+  top: 7px;
+  left: 11px;
+  height: 25px;
+  width: 25px;
+  z-index: -2;
+  border-radius: 50%;
+  border: 3px solid theme-colors('bg-color', 'primary');
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: transparent;
+    top: 3px;
+    left: 3px;
+  }
+}
+
+.form-control.radio input:checked ~ .checkmark::after {
+  background: theme-colors('bg-color', 'primary');
+}
+
+
+.form-heading {
+  max-width: $form-witdh;
+  margin: 0 auto;
+
+}
+.inline-adj {
+  display: inline;
+  margin-left:20px;
+}
+
+
+.form-center {
+  padding: 0 20px;
+}
+.form-control {
+  position: relative;
+  textarea,
+  input {
+    font-weight: 400;
+    font-family: $font-primary;
+    background-color: theme-colors('bg-color', 'inputBgColor');
+  }
+  textarea:focus,
+  input:focus {
+    background-color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px #bfdbfe;
+  }
+}
+
+label {
+  font-size: $text--sm;
+  font-weight: 600;
+}
+
+
