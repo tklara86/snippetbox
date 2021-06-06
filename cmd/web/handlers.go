@@ -1,13 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
-	"os"
 	"strconv"
-)
 
+	"github.com/tklara86/pkg/models"
+)
 
 // home Home page
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -18,26 +18,35 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/footer.partial.tmpl",
-		"./ui/html/base.layout.tmpl",
-	}
-
-	ts, err := template.ParseFiles(files...)
+	s, err := app.snippets.Latest()
 	if err != nil {
-		app.errorLog.Println(err.Error())
 		app.serverError(w, err)
 		return
 	}
-	err = ts.Execute(w,nil)
-	if err != nil {
-		app.errorLog.Println(err.Error())
-		app.serverError(w, err)
+
+	for _, snippet := range s {
+		fmt.Fprintf(w, "%v\n", snippet)
 	}
 
-}
+	// files := []string{
+	// 	"./ui/html/home.page.tmpl",
+	// 	"./ui/html/footer.partial.tmpl",
+	// 	"./ui/html/base.layout.tmpl",
+	// }
 
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil {
+	// 	app.errorLog.Println(err.Error())
+	// 	app.serverError(w, err)
+	// 	return
+	// }
+	// err = ts.Execute(w, nil)
+	// if err != nil {
+	// 	app.errorLog.Println(err.Error())
+	// 	app.serverError(w, err)
+	// }
+
+}
 
 // showSnippet displays snippet with specific id
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -49,35 +58,37 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = fmt.Fprintf(w,"Snippet with ID %d", id)
-
+	s, err := app.snippets.Get(id)
 	if err != nil {
-		_, err = fmt.Fprintf(os.Stderr, "Fprintf: %v\n", err)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-}
-// createSnippet creates a new snippet
-func (app *application) createSnippet (w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		_,err := w.Write([]byte("Method not allowed"))
-
-		if err != nil {
-			app.clientError(w, http.StatusMethodNotAllowed)
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
 		}
 		return
 	}
-	_, err := fmt.Fprintf(w,"<h1>Create snippet route</h1>")
+	fmt.Fprintf(w, "%v", s)
 
-	if err != nil {
-		fmt.Println(err)
-	}
 }
 
+// createSnippet creates a new snippet
+func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	title := "O snail"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
+	expires := "7"
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+
+}

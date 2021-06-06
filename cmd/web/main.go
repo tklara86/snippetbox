@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/tklara86/pkg/models/mysql"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -16,6 +17,7 @@ import (
 type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
+	snippets *mysql.SnippetModel
 }
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 
 	// define DSN string
-	dsn := flag.String("dsn", fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword, dbHost, dbName), "MySQL data source name")
+	dsn := flag.String("dsn", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName), "MySQL data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.LstdFlags)
@@ -50,6 +52,9 @@ func main() {
 	app := &application{
 		infoLog:  infoLog,
 		errorLog: errorLog,
+		snippets: &mysql.SnippetModel{
+			DB: db,
+		},
 	}
 
 	srv := &http.Server{
@@ -57,7 +62,7 @@ func main() {
 		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
-	colorizeTerminalMsg(ColorGreen)
+	colorizeTerminalMsg(ColorBlue)
 	infoLog.Printf("Started server on port %s", srv.Addr)
 	err = srv.ListenAndServe()
 
