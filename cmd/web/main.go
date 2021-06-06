@@ -4,16 +4,17 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
-	infoLog *log.Logger
+	infoLog  *log.Logger
 	errorLog *log.Logger
 }
 
@@ -38,7 +39,7 @@ func main() {
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.LstdFlags)
-	errorLog := log.New(os.Stderr, "ERROR\t", log.LstdFlags |log.Lshortfile)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.LstdFlags|log.Lshortfile)
 
 	db, err := openDB(*dsn)
 	if err != nil {
@@ -47,13 +48,13 @@ func main() {
 	defer db.Close()
 
 	app := &application{
-		infoLog: infoLog,
+		infoLog:  infoLog,
 		errorLog: errorLog,
 	}
 
 	srv := &http.Server{
-		Addr: *addr,
-		Handler: app.routes(),
+		Addr:     *addr,
+		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
 	colorizeTerminalMsg(ColorGreen)
