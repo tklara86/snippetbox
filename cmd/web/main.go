@@ -17,10 +17,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+
+type contextKey string
+
+const contextKeyIsAuthenticated = contextKey("isAuthenticated")
+
 type application struct {
 	infoLog       *log.Logger
 	errorLog      *log.Logger
 	snippets      *mysql.SnippetModel
+	users		  *mysql.UserModel
 	session 	  *sessions.Session
 	templateCache map[string]*template.Template
 }
@@ -76,6 +82,9 @@ func main() {
 			DB: db,
 		},
 		templateCache: templateCache,
+		users: &mysql.UserModel{
+			DB: db,
+		},
 	}
 
 	srv := &http.Server{
