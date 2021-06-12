@@ -43,7 +43,9 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{Snippet: s}
+	data := &templateData{
+		Snippet: s,
+	}
 
 	app.render(w, r, "show.page.tmpl", data)
 
@@ -81,6 +83,12 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	//Use the Put() method to add a string value ("Your snippet was saved
+	// successfully!") and the corresponding key ("flash") to the session
+	// data.
+	app.session.Put(r, "flash",  "Snippet successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 
 }

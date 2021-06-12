@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/golangcollege/sessions"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/tklara86/pkg/models/mysql"
@@ -19,6 +21,7 @@ type application struct {
 	infoLog       *log.Logger
 	errorLog      *log.Logger
 	snippets      *mysql.SnippetModel
+	session 	  *sessions.Session
 	templateCache map[string]*template.Template
 }
 
@@ -34,12 +37,17 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")
 	dbName := os.Getenv("DB_NAME")
+	sessionSecret := os.Getenv("SECRET")
+
 
 	// address flag
 	addr := flag.String("addr", ":4000", "HTTP network address")
 
 	// define DSN string
 	dsn := flag.String("dsn", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName), "MySQL data source name")
+
+	// secret
+	secret := flag.String("secret", sessionSecret, "secret key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.LstdFlags)
@@ -57,9 +65,13 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+
 	app := &application{
 		infoLog:  infoLog,
 		errorLog: errorLog,
+		session: session,
 		snippets: &mysql.SnippetModel{
 			DB: db,
 		},

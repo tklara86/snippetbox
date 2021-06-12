@@ -13,6 +13,10 @@
         <a href='/snippet/create'>Create snippet</a>
     </nav>
     <main>
+        {{with .Flash}}
+            <p>{{.}}</p>
+        {{end}}
+
        {{ template "main" .}}
     </main>
     {{ template "footer" .}}
