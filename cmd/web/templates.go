@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/tklara86/pkg/forms"
 	"html/template"
 	"path/filepath"
 	"time"
@@ -12,6 +13,7 @@ type templateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+	Form *forms.Form
 }
 
 func humanDate(t time.Time) string {
